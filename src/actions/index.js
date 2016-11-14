@@ -3,6 +3,9 @@ export const RECEIVE_POSTS = 'RECEIVE_POSTS'
 export const SELECT_REDDIT = 'SELECT_REDDIT'
 export const INVALIDATE_REDDIT = 'INVALIDATE_REDDIT'
 
+export const REQUEST_QUOTE = 'REQUEST_QUOTE'
+export const RECEIVE_QUOTE = 'RECEIVE_QUOTE'
+
 export const selectReddit = reddit => ({
   type: SELECT_REDDIT,
   reddit
@@ -47,4 +50,21 @@ export const fetchPostsIfNeeded = reddit => (dispatch, getState) => {
   if (shouldFetchPosts(getState(), reddit)) {
     return dispatch(fetchPosts(reddit))
   }
+}
+
+export const requestQuote = () => ({
+  type: REQUEST_QUOTE
+})
+
+export const receiveQuote = (quote) => ({
+  type: RECEIVE_QUOTE,
+  quote: quote,
+  receivedAt: Date.now()
+})
+
+export const fetchQuote = reddit => dispatch => {
+  dispatch(requestQuote())
+  return fetch(`http://www.dennybiasiolli.com/citazione.php?type=json`)
+    .then(response => response.json())
+    .then(json => dispatch(receiveQuote(json)))
 }

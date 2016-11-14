@@ -1,6 +1,7 @@
 import React, { Component, PropTypes } from 'react'
 import { connect } from 'react-redux'
-import { selectReddit, fetchPostsIfNeeded, invalidateReddit } from '../actions'
+import { selectReddit, fetchPostsIfNeeded, invalidateReddit, fetchQuote } from '../actions'
+import Quote from '../components/Quote'
 import Picker from '../components/Picker'
 import Posts from '../components/Posts'
 
@@ -10,12 +11,15 @@ class App extends Component {
     posts: PropTypes.array.isRequired,
     isFetching: PropTypes.bool.isRequired,
     lastUpdated: PropTypes.number,
-    dispatch: PropTypes.func.isRequired
+    dispatch: PropTypes.func.isRequired,
+    isFetchingQuote: PropTypes.bool.isRequired,
+    quote: PropTypes.object.isRequired
   }
 
   componentDidMount() {
     const { dispatch, selectedReddit } = this.props
     dispatch(fetchPostsIfNeeded(selectedReddit))
+    dispatch(fetchQuote())
   }
 
   componentWillReceiveProps(nextProps) {
@@ -35,13 +39,17 @@ class App extends Component {
     const { dispatch, selectedReddit } = this.props
     dispatch(invalidateReddit(selectedReddit))
     dispatch(fetchPostsIfNeeded(selectedReddit))
+    dispatch(fetchQuote())
   }
 
   render() {
-    const { selectedReddit, posts, isFetching, lastUpdated } = this.props
+    const { selectedReddit, posts, isFetching, lastUpdated, isFetchingQuote, quote } = this.props
     const isEmpty = posts.length === 0
     return (
       <div>
+        {
+          (isFetchingQuote ? <h2>Loading...</h2> : <Quote quote={quote}></Quote>)
+        }
         <Picker value={selectedReddit}
                 onChange={this.handleChange}
                 options={[ 'reactjs', 'frontend' ]} />
@@ -71,7 +79,7 @@ class App extends Component {
 }
 
 const mapStateToProps = state => {
-  const { selectedReddit, postsByReddit } = state
+  const { selectedReddit, postsByReddit, quote } = state
   const {
     isFetching,
     lastUpdated,
@@ -80,12 +88,21 @@ const mapStateToProps = state => {
     isFetching: true,
     items: []
   }
+  const {
+    isFetchingQuote,
+    quote: quote1
+  } = quote || {
+    isFetchingQuote: true,
+    quote: {}
+  }
 
   return {
     selectedReddit,
     posts,
     isFetching,
-    lastUpdated
+    lastUpdated,
+    isFetchingQuote,
+    quote: quote1
   }
 }
 

@@ -1,7 +1,8 @@
 import { combineReducers } from 'redux'
 import {
   SELECT_REDDIT, INVALIDATE_REDDIT,
-  REQUEST_POSTS, RECEIVE_POSTS
+  REQUEST_POSTS, RECEIVE_POSTS,
+  REQUEST_QUOTE, RECEIVE_QUOTE
 } from '../actions'
 
 const selectedReddit = (state = 'reactjs', action) => {
@@ -57,9 +58,31 @@ const postsByReddit = (state = { }, action) => {
   }
 }
 
+const quote = (state = {
+  isFetchingQuote: false,
+  quote: {}
+}, action) => {
+  switch (action.type) {
+    case REQUEST_QUOTE:
+      return {
+        ...state,
+        isFetchingQuote: true
+      }
+    case RECEIVE_QUOTE:
+      return {
+        ...state,
+        isFetchingQuote: false,
+        quote: action.quote
+      }
+    default:
+      return state
+  }
+}
+
 const rootReducer = combineReducers({
   postsByReddit,
-  selectedReddit
+  selectedReddit,
+  quote
 })
 
 export default rootReducer
